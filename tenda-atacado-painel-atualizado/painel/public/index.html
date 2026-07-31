@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel de Ocorrências — Tenda Atacado</title>
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#0a1929" />
+<link rel="icon" href="/icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Tenda Atacado" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg: #0a1929;
+    --panel: #10233a;
+    --panel-2: #163049;
+    --line: #1e4266;
+    --text: #e9f2fb;
+    --muted: #7ea3c4;
+    --amber: #4fc3f7;
+    --red: #e05a56;
+    --green: #45b57e;
+    --focus: #6fd0ff;
+    --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+    --font-body: "Inter", "Segoe UI", -apple-system, sans-serif;
+    --font-data: "IBM Plex Mono", "Consolas", monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: var(--font-body);
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .top{
+    background:var(--panel);
+    border-bottom:3px solid var(--amber);
+    padding:18px 20px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .top h1{
+    font-family: var(--font-display);
+    font-size:1.2rem;
+    font-weight:600;
+    margin:0;
+    letter-spacing:0.01em;
+  }
+  .top .eyebrow{
+    font-family: var(--font-body);
+    color:var(--amber);
+    font-size:0.7rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+    display:block;
+    margin-bottom:3px;
+  }
+  #sair{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:6px 12px;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:0.8rem;
+  }
+  #sair:hover{ color:var(--text); border-color:var(--muted); }
+
+  /* LOGIN */
+  #tela-login{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .login-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-top:3px solid var(--amber);
+    padding:32px 28px;
+    width:100%;
+    max-width:340px;
+    border-radius:6px;
+  }
+  .login-box .eyebrow{
+    color:var(--amber);
+    font-size:0.7rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.16em;
+  }
+  .login-box h2{ font-family: var(--font-display); margin:6px 0 20px; font-size:1.4rem; font-weight:600; }
+  .login-box input{ width:100%; }
+  .login-box button{ width:100%; margin-top:12px; }
+  #erro-login{ color:var(--red); font-size:0.85rem; margin-top:10px; min-height:1em; }
+
+  main{ max-width:920px; margin:0 auto; padding:20px; }
+
+  .resumo{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+    margin-bottom:22px;
+  }
+  .cartao{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+  }
+  .cartao .rotulo{ color:var(--muted); font-size:0.74rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; }
+  .cartao .valor{ font-family: var(--font-data); font-size:1.7rem; font-weight:600; margin-top:5px; }
+
+  #btn-modo{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:6px;
+    padding:16px 18px;
+    text-align:left;
+    cursor:pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  #btn-modo:hover{ border-color:var(--focus); }
+  #btn-modo:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+  #btn-modo .rotulo{ color:var(--muted); font-size:0.74rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; }
+  #btn-modo .valor{ font-family: var(--font-data); font-size:1.7rem; font-weight:600; margin-top:5px; transition: color 0.15s ease; }
+  #btn-modo .dica{ color:var(--muted); font-size:0.72rem; margin-top:6px; }
+  #btn-modo.modo-quadrilha .valor{ color:var(--red); }
+  #btn-modo.modo-geral .valor{ color:var(--green); }
+
+  form#form-ocorrencia{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:18px;
+    margin-bottom:24px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+  }
+  form#form-ocorrencia .full{ grid-column: 1 / -1; }
+  label{ display:block; font-size:0.78rem; font-weight:500; color:var(--muted); margin-bottom:5px; letter-spacing:0.01em; }
+  input, textarea, select{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:9px 10px;
+    border-radius:4px;
+    font-size:0.92rem;
+    font-family: var(--font-body);
+  }
+  input:focus-visible, textarea:focus-visible, button:focus-visible, select:focus-visible{
+    outline:2px solid var(--focus); outline-offset:1px;
+  }
+  input[readonly]{
+    opacity:0.75;
+    cursor:not-allowed;
+  }
+  textarea{ min-height:70px; resize:vertical; }
+  .checkbox-linha{ display:flex; align-items:center; gap:8px; }
+  .checkbox-linha input{ width:auto; }
+  .checkbox-linha label{ margin:0; color:var(--text); font-size:0.9rem; }
+
+  button{
+    background:var(--amber);
+    color:#1b1500;
+    border:none;
+    padding:10px 16px;
+    border-radius:4px;
+    font-family: var(--font-display);
+    font-weight:600;
+    letter-spacing:0.01em;
+    cursor:pointer;
+    font-size:0.9rem;
+  }
+  button:hover{ filter:brightness(1.08); }
+
+  .regionais{ margin-bottom:24px; }
+  #lista-regionais{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap:12px;
+  }
+  .cartao-regional{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--amber);
+    border-radius:6px;
+    padding:14px 16px;
+    cursor:pointer;
+    transition: border-color 0.15s ease;
+  }
+  .cartao-regional:hover{ border-color:var(--focus); }
+  .cartao-regional.ativo{ border-left-color:var(--focus); background:var(--panel-2); }
+  .cartao-regional .nome-regional{ font-family: var(--font-display); font-weight:600; font-size:0.94rem; margin-bottom:8px; }
+  .cartao-regional .linha-metrica{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-top:3px;
+  }
+  .cartao-regional .linha-metrica strong{ font-family: var(--font-data); color:var(--text); font-weight:600; }
+  .cartao-regional.ativo .linha-metrica strong{ color:var(--focus); }
+  .sem-regional{ color:var(--muted); font-size:0.85rem; padding:8px 0; }
+
+  .verificar{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+    margin-bottom:22px;
+  }
+  .verificar .lista-titulo{ margin-bottom:12px; }
+  .verificar .linha-filtros{
+    display:grid;
+    grid-template-columns: 1.2fr 1.2fr 1fr 1fr auto auto;
+    gap:10px;
+    align-items:end;
+  }
+  .verificar .campo label{ margin-bottom:5px; }
+  .verificar .campo-check{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding-bottom:9px;
+  }
+  .verificar .campo-check input{ width:auto; }
+  .verificar .campo-check label{ margin:0; color:var(--text); font-size:0.85rem; }
+  #btn-limpar-filtro{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--muted);
+  }
+  #btn-limpar-filtro:hover{ color:var(--text); border-color:var(--muted); }
+  #resultado-filtro{
+    color:var(--muted);
+    font-size:0.8rem;
+    margin-top:12px;
+  }
+  @media (max-width:720px){
+    .verificar .linha-filtros{ grid-template-columns: 1fr 1fr; }
+  }
+
+  .lista-titulo{
+    color:var(--muted);
+    font-family: var(--font-display);
+    font-size:0.78rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    margin:0 0 10px;
+  }
+  .ocorrencia{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--line);
+    border-radius:4px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .ocorrencia.quadrilha{ border-left-color:var(--red); }
+  .ocorrencia-foto{ display:block; width:100%; max-height:160px; object-fit:cover; border-radius:6px; margin-bottom:10px; }
+  .modal-foto{ display:block; width:100%; max-height:320px; object-fit:contain; border-radius:6px; margin:10px 0; background:var(--bg); cursor:zoom-in; }
+  .ocorrencia .cabecalho{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .ocorrencia .loja{ font-family: var(--font-display); font-weight:600; }
+  .regional-tag{ color:var(--muted); font-weight:400; font-size:0.85rem; font-family: var(--font-body); }
+  .ocorrencia .data{ font-family: var(--font-data); color:var(--muted); font-size:0.8rem; }
+  .ocorrencia .descricao{ margin:8px 0; color:var(--text); font-size:0.92rem; line-height:1.4; }
+  .ocorrencia .rodape{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:0.85rem;
+  }
+  .tag-quadrilha{
+    font-family: var(--font-display);
+    color:var(--red);
+    font-size:0.72rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    border:1px solid var(--red);
+    border-radius:3px;
+    padding:1px 6px;
+  }
+  .valor-recuperado{ font-family: var(--font-data); color:var(--green); font-weight:600; }
+  .excluir{
+    background:none;
+    border:none;
+    color:var(--muted);
+    cursor:pointer;
+    font-size:0.8rem;
+    padding:2px 6px;
+  }
+  .excluir:hover{ color:var(--red); }
+  .vazio{ color:var(--muted); text-align:center; padding:30px 10px; font-size:0.9rem; }
+
+  .cartao-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--amber);
+    border-radius:6px;
+    padding:16px 18px;
+    width:100%;
+    text-align:left;
+    cursor:pointer;
+    margin-bottom:24px;
+    transition: border-color 0.15s ease;
+  }
+  .cartao-nav:hover{ border-color:var(--focus); }
+  .cartao-nav .rotulo{ color:var(--muted); font-size:0.74rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; }
+  .cartao-nav .valor{ font-family: var(--font-data); font-size:1.4rem; font-weight:600; margin-top:5px; color:var(--text); }
+  .cartao-nav .seta{ font-size:1.5rem; color:var(--amber); line-height:1; }
+
+  .painel-secundario{
+    display:grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap:16px;
+    align-items:stretch;
+    margin-bottom:24px;
+  }
+  .painel-secundario .coluna-nav{
+    display:flex;
+    flex-direction:column;
+  }
+  .painel-secundario .coluna-nav .cartao-nav{ margin-bottom:0; flex:1; }
+  .painel-secundario .coluna-nav .cartao-nav + .cartao-nav{ margin-top:16px; }
+  @media (max-width: 640px){
+    .painel-secundario{ grid-template-columns: 1fr; }
+  }
+
+  .cartao-grafico{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+  }
+  .cartao-grafico .rotulo{ color:var(--muted); font-size:0.74rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:14px; }
+  .grafico-barras{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-around;
+    gap:14px;
+    height:150px;
+  }
+  .grafico-coluna{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    height:100%;
+    flex:1;
+  }
+  .grafico-valor{
+    font-family: var(--font-data);
+    font-size:1.05rem;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .grafico-barra{
+    width:100%;
+    max-width:52px;
+    border-radius:4px 4px 0 0;
+    min-height:4px;
+    transition: height 0.25s ease;
+  }
+  .grafico-barra.apoio-copia{ background:var(--amber); }
+  .grafico-barra.quadrilha{ background:var(--red); }
+  .grafico-barra.monitoramento{ background:var(--green); }
+  .grafico-rotulo{
+    margin-top:8px;
+    font-size:0.72rem;
+    color:var(--muted);
+    text-align:center;
+    line-height:1.3;
+  }
+
+  .cartao-grafico-regionais{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px 18px;
+    margin-bottom:24px;
+  }
+  .cartao-grafico-regionais .rotulo{ color:var(--muted); font-size:0.74rem; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:14px; }
+  .grafico-barras-regionais{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-around;
+    gap:10px;
+    height:150px;
+  }
+  .grafico-coluna-regional{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    height:100%;
+    flex:1;
+    cursor:pointer;
+    background:none;
+    border:none;
+    padding:0;
+    font-family: var(--font-body);
+  }
+  .grafico-coluna-regional .grafico-barra{
+    max-width:60px;
+  }
+  .grafico-coluna-regional:hover .grafico-rotulo{ color:var(--text); }
+  .grafico-barra.cor-1{ background:var(--amber); }
+  .grafico-barra.cor-2{ background:var(--focus); }
+  .grafico-barra.cor-3{ background:var(--green); }
+  .grafico-barra.cor-4{ background:var(--red); }
+
+  .pagina-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .pagina-header .lista-titulo{ margin:0; }
+  #btn-voltar{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:6px 12px;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  #btn-voltar:hover{ color:var(--text); border-color:var(--muted); }
+
+  .ocorrencia{ cursor:pointer; transition: border-color 0.15s ease; }
+  .ocorrencia:hover{ border-color:var(--focus); }
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(5,12,20,0.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+  .modal-caixa{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-top:3px solid var(--amber);
+    border-radius:6px;
+    padding:24px;
+    max-width:440px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+  }
+  .modal-caixa h3{ font-family: var(--font-display); margin:0 0 4px; font-size:1.15rem; }
+  .modal-eyebrow{ color:var(--amber); font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.14em; }
+  .modal-linha{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); font-size:0.88rem; }
+  .modal-linha:last-of-type{ border-bottom:none; }
+  .modal-linha span:first-child{ color:var(--muted); }
+  .modal-linha span:last-child{ font-family: var(--font-data); text-align:right; }
+  .modal-descricao{ margin:14px 0; padding:12px; background:var(--bg); border-radius:4px; font-size:0.9rem; line-height:1.5; }
+  .modal-acoes{ display:flex; gap:10px; margin-top:18px; }
+  .modal-acoes button{ flex:1; }
+  #modal-fechar{ background:none; border:1px solid var(--line); color:var(--muted); }
+  #modal-fechar:hover{ color:var(--text); border-color:var(--muted); }
+  #modal-excluir{ background:var(--red); color:#fff; }
+
+  .grid-lojas{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap:12px;
+    margin-top:12px;
+  }
+  .cartao-loja{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--amber);
+    border-radius:6px;
+    padding:14px 16px;
+    cursor:pointer;
+    transition: border-color 0.15s ease;
+  }
+  .cartao-loja:hover, .cartao-loja:focus-visible{ border-color:var(--focus); }
+  .cartao-loja .codigo-loja{ font-family: var(--font-display); font-weight:600; font-size:0.94rem; margin-bottom:4px; }
+  .cartao-loja .total-ocorrencias-loja{ color:var(--muted); font-size:0.8rem; }
+  .cartao-loja .linha-metrica{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-top:3px;
+  }
+  .cartao-loja .linha-metrica strong{ font-family: var(--font-data); color:var(--text); font-weight:600; }
+
+  .tooltip-loja{
+    display:none;
+    position:absolute;
+    left:0;
+    top:calc(100% + 6px);
+    z-index:20;
+    background:var(--panel-2);
+    border:1px solid var(--focus);
+    border-radius:6px;
+    padding:10px 12px;
+    min-width:190px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.45);
+  }
+  .cartao-loja:hover .tooltip-loja,
+  .cartao-loja:focus-visible .tooltip-loja,
+  .cartao-loja:focus-within .tooltip-loja{ display:block; }
+  .tooltip-loja .tooltip-linha{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    font-size:0.78rem;
+    padding:3px 0;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .tooltip-loja .tooltip-linha strong{ font-family: var(--font-data); color:var(--text); font-weight:600; }
+
+  .tooltip-ocorrencia{
+    display:none;
+    position:absolute;
+    left:0;
+    right:0;
+    top:calc(100% + 6px);
+    z-index:30;
+    background:var(--panel-2);
+    border:1px solid var(--focus);
+    border-radius:6px;
+    padding:10px 12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.45);
+  }
+  .ocorrencia:hover .tooltip-ocorrencia,
+  .ocorrencia:focus-visible .tooltip-ocorrencia,
+  .ocorrencia:focus-within .tooltip-ocorrencia{ display:block; }
+  .tooltip-ocorrencia .tooltip-linha{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    font-size:0.78rem;
+    padding:3px 0;
+    color:var(--muted);
+  }
+  .tooltip-ocorrencia .tooltip-linha:not(:last-child){ border-bottom:1px solid var(--line); }
+  .tooltip-ocorrencia .tooltip-linha strong{ font-family: var(--font-data); color:var(--text); font-weight:600; text-align:right; }
+
+  .tag-inibida, .tag-nao-inibida{
+    font-family: var(--font-display);
+    font-size:0.72rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    border-radius:3px;
+    padding:1px 6px;
+    white-space:nowrap;
+  }
+  .tag-inibida{ color:var(--green); border:1px solid var(--green); }
+  .tag-nao-inibida{ color:var(--red); border:1px solid var(--red); }
+
+  @media (max-width:560px){
+    form#form-ocorrencia{ grid-template-columns: 1fr; }
+    .resumo{ grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="tela-login">
+  <div class="login-box">
+    <span class="eyebrow">Tenda Atacado</span>
+    <h2>Painel de Ocorrências</h2>
+    <label for="senha">Senha de acesso</label>
+    <input type="password" id="senha" autocomplete="current-password" />
+    <button id="btn-entrar">Entrar</button>
+    <div id="erro-login"></div>
+  </div>
+</div>
+
+<div id="tela-painel" style="display:none;">
+  <div class="top">
+    <div>
+      <span class="eyebrow">Tenda Atacado</span>
+      <h1>Painel de Ocorrências de Roubo</h1>
+    </div>
+    <button id="sair">Sair</button>
+  </div>
+
+  <main>
+    <div id="pagina-dashboard">
+      <div class="resumo">
+        <div class="cartao">
+          <div class="rotulo">Ocorrências registradas</div>
+          <div class="valor" id="total-ocorrencias">0</div>
+        </div>
+        <button id="btn-modo" class="modo-geral" type="button">
+          <div class="rotulo">Valor recuperado (total)</div>
+          <div class="valor" id="valor-modo">R$ 0,00</div>
+          <div class="dica">Clique para ver só valor recuperado de quadrilha</div>
+        </button>
+      </div>
+
+      <div class="painel-secundario">
+        <div class="coluna-nav">
+          <button id="btn-abrir-regionais" class="cartao-nav" type="button">
+            <div>
+              <div class="rotulo">Painel de regionais</div>
+              <div class="valor">4 regionais</div>
+            </div>
+            <span class="seta">→</span>
+          </button>
+
+          <button id="btn-abrir-ocorrencias" class="cartao-nav" type="button">
+            <div>
+              <div class="rotulo">Ocorrências recentes</div>
+              <div class="valor" id="contador-ocorrencias">0 registradas</div>
+            </div>
+            <span class="seta">→</span>
+          </button>
+        </div>
+
+        <div class="cartao-grafico">
+          <div class="rotulo">Apoio de cópia, quadrilha e monitoramento</div>
+          <div class="grafico-barras">
+            <div class="grafico-coluna">
+              <div class="grafico-valor" id="grafico-valor-apoio">0</div>
+              <div class="grafico-barra apoio-copia" id="grafico-barra-apoio" style="height:4px;"></div>
+              <div class="grafico-rotulo">Apoio de cópia</div>
+            </div>
+            <div class="grafico-coluna">
+              <div class="grafico-valor" id="grafico-valor-quadrilha">0</div>
+              <div class="grafico-barra quadrilha" id="grafico-barra-quadrilha" style="height:4px;"></div>
+              <div class="grafico-rotulo">Quadrilha</div>
+            </div>
+            <div class="grafico-coluna">
+              <div class="grafico-valor" id="grafico-valor-monitoramento">0</div>
+              <div class="grafico-barra monitoramento" id="grafico-barra-monitoramento" style="height:4px;"></div>
+              <div class="grafico-rotulo">Monitoramento</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cartao-grafico-regionais">
+        <div class="rotulo">Ocorrências por regional</div>
+        <div class="grafico-barras-regionais" id="grafico-regionais"></div>
+      </div>
+
+      <form id="form-ocorrencia">
+        <div>
+          <label for="nome">Seu nome</label>
+          <input type="text" id="nome" placeholder="Quem está registrando" required />
+        </div>
+        <div>
+          <label for="data">Data</label>
+          <input type="date" id="data" required />
+        </div>
+        <div>
+          <label for="loja">Loja</label>
+          <select id="loja" required>
+            <option value="" disabled selected>Selecione a loja...</option>
+          </select>
+        </div>
+        <div>
+          <label for="regional">Regional</label>
+          <input type="text" id="regional" placeholder="Preenchido automaticamente" readonly />
+        </div>
+        <div class="full">
+          <label for="descricao">Descrição da ocorrência</label>
+          <textarea id="descricao" placeholder="O que aconteceu..." required></textarea>
+        </div>
+        <div>
+          <label for="valorRecuperado">Valor recuperado (R$)</label>
+          <input type="text" inputmode="numeric" id="valorRecuperado" placeholder="R$ 0,00" />
+        </div>
+        <div class="full">
+          <label for="foto">Foto (print, câmera, etc.)</label>
+          <input type="file" id="foto" accept="image/*" />
+          <img id="foto-preview" style="display:none; max-width:160px; border-radius:8px; margin-top:8px;" />
+        </div>
+        <div class="checkbox-linha" style="align-self:end; padding-bottom:9px;">
+          <input type="checkbox" id="quadrilha" />
+          <label for="quadrilha">Envolveu quadrilha</label>
+        </div>
+        <div class="checkbox-linha" style="align-self:end; padding-bottom:9px;">
+          <input type="checkbox" id="inibido" />
+          <label for="inibido">Ocorrência foi inibida</label>
+        </div>
+        <div class="checkbox-linha" style="align-self:end; padding-bottom:9px;">
+          <input type="checkbox" id="apoioCopia" />
+          <label for="apoioCopia">Teve apoio de cópia</label>
+        </div>
+        <div class="checkbox-linha" style="align-self:end; padding-bottom:9px;">
+          <input type="checkbox" id="monitoramento" />
+          <label for="monitoramento">Teve monitoramento</label>
+        </div>
+        <div class="full">
+          <button type="submit">Registrar ocorrência</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="pagina-regionais" style="display:none;">
+      <div class="pagina-header">
+        <button id="btn-voltar-regionais" type="button">← Voltar</button>
+        <p class="lista-titulo" id="titulo-pagina-regionais">Painel de regionais</p>
+      </div>
+
+      <div id="vista-regionais">
+        <div id="lista-regionais"></div>
+      </div>
+
+      <div id="vista-lojas" style="display:none;">
+        <div id="lista-lojas-regional"></div>
+      </div>
+
+      <div id="vista-ocorrencias-loja" style="display:none;">
+        <div id="lista-ocorrencias-loja"></div>
+      </div>
+    </div>
+
+    <div id="pagina-ocorrencias" style="display:none;">
+      <div class="pagina-header">
+        <button id="btn-voltar" type="button">← Voltar</button>
+        <p class="lista-titulo">Ocorrências recentes</p>
+      </div>
+
+      <div class="verificar">
+        <p class="lista-titulo">Verificar registros</p>
+        <div class="linha-filtros">
+          <div class="campo">
+            <label for="f-loja">Loja</label>
+            <input type="text" id="f-loja" placeholder="Buscar por loja..." />
+          </div>
+          <div class="campo">
+            <label for="f-regional">Regional</label>
+            <input type="text" id="f-regional" placeholder="Buscar por regional..." />
+          </div>
+          <div class="campo">
+            <label for="f-data-ini">De</label>
+            <input type="date" id="f-data-ini" />
+          </div>
+          <div class="campo">
+            <label for="f-data-fim">Até</label>
+            <input type="date" id="f-data-fim" />
+          </div>
+          <div class="campo-check">
+            <input type="checkbox" id="f-quadrilha" />
+            <label for="f-quadrilha">Só quadrilha</label>
+          </div>
+          <button id="btn-limpar-filtro" type="button">Limpar</button>
+        </div>
+        <div id="resultado-filtro"></div>
+      </div>
+
+      <div id="lista"></div>
+    </div>
+  </main>
+</div>
+
+<div id="modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-caixa" id="modal-conteudo"></div>
+</div>
+
+<script>
+  const $ = (sel) => document.querySelector(sel);
+  let senhaAtual = localStorage.getItem("senha_painel") || "";
+  let modoQuadrilha = false;
+  let ocorrencias = [];
+
+  // ---------- Mapeamento fixo: Regional / Responsável / Lojas ----------
+  const REGIONAIS = [
+    {
+      nome: "Vale e Litoral Norte",
+      responsavel: "João Nunes",
+      lojas: ["CT06","CT08","CT09","CT13","CT14","CT15","CT18","CT34","CT47","CT48","CT57","CT67"],
+    },
+    {
+      nome: "Interior Noroeste",
+      responsavel: "Marcio Lucio",
+      lojas: ["CT25","CT27","CT28","CT32","CT35","CT37","CT39","CT59","CT60","CT63","CT64"],
+    },
+    {
+      nome: "Interior Grande SP e Litoral Sul",
+      responsavel: "Mario Antonio",
+      lojas: ["CT17","CT20","CT33","CT36","CT41","CT43","CT44","CT49","CT51","CT53","CT58"],
+    },
+    {
+      nome: "Interior e Campinas",
+      responsavel: "Marcus Paulo",
+      lojas: ["CAMP-CEASA","CT03","CT16","CT30","CT31","CT38","CT50","CT54","CT62","CT65","CT66"],
+    },
+  ];
+
+  // Mapa reverso: código da loja -> { regional, responsavel }
+  const MAPA_LOJAS = {};
+  REGIONAIS.forEach((r) => {
+    r.lojas.forEach((codigo) => {
+      MAPA_LOJAS[codigo] = { regional: r.nome, responsavel: r.responsavel };
+    });
+  });
+
+  function popularSelectLojas(){
+    const select = $("#loja");
+    REGIONAIS.forEach((r) => {
+      const grupo = document.createElement("optgroup");
+      grupo.label = r.nome;
+      r.lojas.forEach((codigo) => {
+        const opt = document.createElement("option");
+        opt.value = codigo;
+        opt.textContent = codigo;
+        grupo.appendChild(opt);
+      });
+      select.appendChild(grupo);
+    });
+  }
+  popularSelectLojas();
+
+  $("#loja").addEventListener("change", () => {
+    const info = MAPA_LOJAS[$("#loja").value];
+    $("#regional").value = info ? info.regional : "";
+  });
+
+  function formatarMoeda(v){
+    const numero = Number(v) || 0;
+    return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+  function formatarData(iso){
+    const [ano, mes, dia] = iso.split("-");
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  // ---------- Mascara de moeda para o campo "Valor recuperado" ----------
+  function centavosParaTexto(centavos){
+    const valor = centavos / 100;
+    return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+  function textoParaValor(texto){
+    const digitos = (texto || "").replace(/\D/g, "");
+    return digitos ? parseInt(digitos, 10) / 100 : 0;
+  }
+  function aplicarMascaraMoeda(e){
+    const digitos = e.target.value.replace(/\D/g, "");
+    e.target.value = digitos ? centavosParaTexto(parseInt(digitos, 10)) : "";
+  }
+  $("#valorRecuperado").addEventListener("input", aplicarMascaraMoeda);
+
+  // ---------- Foto anexada à ocorrência ----------
+  let fotoBase64Atual = null;
+
+  function redimensionarImagem(arquivo, larguraMax = 1280, qualidade = 0.75){
+    return new Promise((resolve, reject) => {
+      const leitor = new FileReader();
+      leitor.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const escala = Math.min(1, larguraMax / img.width);
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width * escala;
+          canvas.height = img.height * escala;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", qualidade));
+        };
+        img.onerror = reject;
+        img.src = leitor.result;
+      };
+      leitor.onerror = reject;
+      leitor.readAsDataURL(arquivo);
+    });
+  }
+
+  $("#foto").addEventListener("change", async (e) => {
+    const arquivo = e.target.files[0];
+    const preview = $("#foto-preview");
+    if(!arquivo){
+      fotoBase64Atual = null;
+      preview.style.display = "none";
+      return;
+    }
+    try {
+      fotoBase64Atual = await redimensionarImagem(arquivo);
+      preview.src = fotoBase64Atual;
+      preview.style.display = "block";
+    } catch (err) {
+      console.error("Erro ao processar foto:", err);
+      fotoBase64Atual = null;
+    }
+  });
+
+  async function api(caminho, opcoes = {}){
+    const resp = await fetch(caminho, {
+      ...opcoes,
+      headers: {
+        "Content-Type": "application/json",
+        "x-senha": senhaAtual,
+        ...(opcoes.headers || {}),
+      },
+    });
+    if(resp.status === 401){
+      mostrarLogin("Sessão expirada. Entre novamente.");
+      throw new Error("nao autorizado");
+    }
+    return resp;
+  }
+
+  function mostrarLogin(erro){
+    $("#tela-painel").style.display = "none";
+    $("#tela-login").style.display = "flex";
+    $("#erro-login").textContent = erro || "";
+    localStorage.removeItem("senha_painel");
+  }
+
+  function mostrarPainel(){
+    $("#tela-login").style.display = "none";
+    $("#tela-painel").style.display = "block";
+    carregarOcorrencias();
+  }
+
+  $("#btn-entrar").addEventListener("click", async () => {
+    const senha = $("#senha").value;
+    const resp = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senha }),
+    });
+    if(resp.ok){
+      senhaAtual = senha;
+      localStorage.setItem("senha_painel", senha);
+      $("#erro-login").textContent = "";
+      mostrarPainel();
+    } else {
+      $("#erro-login").textContent = "Senha incorreta.";
+    }
+  });
+
+  $("#senha").addEventListener("keydown", (e) => {
+    if(e.key === "Enter") $("#btn-entrar").click();
+  });
+
+  $("#sair").addEventListener("click", () => mostrarLogin());
+
+  $("#btn-abrir-ocorrencias").addEventListener("click", () => {
+    $("#pagina-dashboard").style.display = "none";
+    $("#pagina-ocorrencias").style.display = "block";
+  });
+  $("#btn-voltar").addEventListener("click", () => {
+    $("#pagina-ocorrencias").style.display = "none";
+    $("#pagina-dashboard").style.display = "block";
+  });
+
+  let regionalSelecionada = null;
+  let lojaSelecionada = null;
+
+  $("#btn-abrir-regionais").addEventListener("click", () => {
+    regionalSelecionada = null;
+    lojaSelecionada = null;
+    $("#pagina-dashboard").style.display = "none";
+    $("#pagina-regionais").style.display = "block";
+    atualizarVistaRegionais();
+  });
+
+  $("#btn-voltar-regionais").addEventListener("click", () => {
+    if(lojaSelecionada){
+      lojaSelecionada = null;
+    } else if(regionalSelecionada){
+      regionalSelecionada = null;
+    } else {
+      $("#pagina-regionais").style.display = "none";
+      $("#pagina-dashboard").style.display = "block";
+      return;
+    }
+    atualizarVistaRegionais();
+  });
+
+  function irParaLojas(nomeRegional){
+    regionalSelecionada = nomeRegional;
+    lojaSelecionada = null;
+    atualizarVistaRegionais();
+  }
+
+  function irParaOcorrenciasLoja(codigoLoja){
+    lojaSelecionada = codigoLoja;
+    atualizarVistaRegionais();
+  }
+
+  function atualizarVistaRegionais(){
+    const vRegionais = $("#vista-regionais");
+    const vLojas = $("#vista-lojas");
+    const vLoja = $("#vista-ocorrencias-loja");
+    const titulo = $("#titulo-pagina-regionais");
+
+    if(lojaSelecionada){
+      vRegionais.style.display = "none";
+      vLojas.style.display = "none";
+      vLoja.style.display = "block";
+      titulo.textContent = lojaSelecionada;
+      renderizarOcorrenciasDaLoja(lojaSelecionada);
+    } else if(regionalSelecionada){
+      vRegionais.style.display = "none";
+      vLojas.style.display = "block";
+      vLoja.style.display = "none";
+      titulo.textContent = regionalSelecionada;
+      renderizarLojasDaRegional(regionalSelecionada);
+    } else {
+      vRegionais.style.display = "block";
+      vLojas.style.display = "none";
+      vLoja.style.display = "none";
+      titulo.textContent = "Painel de regionais";
+      renderizarRegionais();
+    }
+  }
+
+  function renderizarLojasDaRegional(nomeRegional){
+    const regionalInfo = REGIONAIS.find((r) => r.nome === nomeRegional);
+    const container = $("#lista-lojas-regional");
+    if(!regionalInfo){
+      container.innerHTML = '<div class="vazio">Regional não encontrada.</div>';
+      return;
+    }
+    container.innerHTML = `
+      <p class="lista-titulo">Responsável: ${escapeHtml(regionalInfo.responsavel)}</p>
+      <div class="grid-lojas">
+        ${regionalInfo.lojas.map((codigo) => {
+          const ocorrenciasLoja = ocorrencias.filter((o) => o.loja === codigo);
+          const inibidas = ocorrenciasLoja.filter((o) => o.inibido).length;
+          const naoInibidas = ocorrenciasLoja.length - inibidas;
+          const quadrilhaCount = ocorrenciasLoja.filter((o) => o.quadrilha).length;
+          const valorRecuperado = ocorrenciasLoja.reduce((s, o) => s + (Number(o.valorRecuperado) || 0), 0);
+          return `
+            <div class="cartao-loja" data-loja="${escapeHtml(codigo)}" tabindex="0">
+              <div class="codigo-loja">${escapeHtml(codigo)}</div>
+              <div class="total-ocorrencias-loja">${ocorrenciasLoja.length} ocorrência(s)</div>
+              <div class="tooltip-loja">
+                <div class="tooltip-linha"><span>Inibidas</span><strong>${inibidas}</strong></div>
+                <div class="tooltip-linha"><span>Não inibidas</span><strong>${naoInibidas}</strong></div>
+                <div class="tooltip-linha"><span>Quadrilha</span><strong>${quadrilhaCount}</strong></div>
+                <div class="tooltip-linha"><span>Valor recuperado</span><strong>${formatarMoeda(valorRecuperado)}</strong></div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+
+    container.querySelectorAll(".cartao-loja").forEach((card) => {
+      card.addEventListener("click", () => irParaOcorrenciasLoja(card.dataset.loja));
+    });
+  }
+
+  function renderizarOcorrenciasDaLoja(codigo){
+    const container = $("#lista-ocorrencias-loja");
+    const lista = ocorrencias.filter((o) => o.loja === codigo);
+
+    if(lista.length === 0){
+      container.innerHTML = '<div class="vazio">Nenhuma ocorrência registrada nessa loja ainda.</div>';
+      return;
+    }
+
+    container.innerHTML = lista.map((o) => `
+      <div class="ocorrencia ${o.quadrilha ? "quadrilha" : ""}" data-id="${o.id}">
+        ${o.foto ? `<img class="ocorrencia-foto" src="${o.foto}" alt="Foto da ocorrência" />` : ""}
+        <div class="cabecalho">
+          <span class="data">${formatarData(o.data)}</span>
+          <span class="${o.inibido ? "tag-inibida" : "tag-nao-inibida"}">${o.inibido ? "Inibida" : "Não inibida"}</span>
+        </div>
+        <div class="descricao">${escapeHtml(o.descricao)}</div>
+        <div class="rodape">
+          <span>
+            ${o.quadrilha ? '<span class="tag-quadrilha">Quadrilha</span> ' : ""}
+            <span class="valor-recuperado">${formatarMoeda(o.valorRecuperado || 0)} recuperado</span>
+          </span>
+        </div>
+      </div>
+    `).join("");
+
+    container.querySelectorAll(".ocorrencia").forEach((card) => {
+      card.addEventListener("click", () => abrirDetalhe(card.dataset.id));
+    });
+  }
+
+  function abrirDetalhe(id){
+    const o = ocorrencias.find((x) => x.id === id);
+    if(!o) return;
+    $("#modal-conteudo").innerHTML = `
+      <span class="modal-eyebrow">${escapeHtml(o.loja)}${o.regional ? ` · ${escapeHtml(o.regional)}` : ""}</span>
+      <h3>Ocorrência de ${formatarData(o.data)}</h3>
+      ${o.foto ? `<a href="${o.foto}" target="_blank" rel="noopener"><img class="modal-foto" src="${o.foto}" alt="Foto da ocorrência" /></a>` : ""}
+      <div class="modal-descricao">${escapeHtml(o.descricao)}</div>
+      <div class="modal-linha"><span>Loja</span><span>${escapeHtml(o.loja)}</span></div>
+      ${o.regional ? `<div class="modal-linha"><span>Regional</span><span>${escapeHtml(o.regional)}</span></div>` : ""}
+      <div class="modal-linha"><span>Data</span><span>${formatarData(o.data)}</span></div>
+      <div class="modal-linha"><span>Registrado por</span><span>${escapeHtml(o.nome || "—")}</span></div>
+      <div class="modal-linha"><span>Valor recuperado</span><span>${formatarMoeda(o.valorRecuperado || 0)}</span></div>
+      <div class="modal-linha"><span>Inibida</span><span>${o.inibido ? "Sim" : "Não"}</span></div>
+      <div class="modal-linha"><span>Quadrilha</span><span>${o.quadrilha ? "Sim" : "Não"}</span></div>
+      <div class="modal-acoes">
+        <button id="modal-fechar" type="button">Fechar</button>
+        <button id="modal-excluir" type="button" data-id="${o.id}">Excluir</button>
+      </div>
+    `;
+    $("#modal-overlay").style.display = "flex";
+    $("#modal-fechar").addEventListener("click", fecharModal);
+    $("#modal-excluir").addEventListener("click", async () => {
+      if(!confirm("Excluir esta ocorrência?")) return;
+      await api(`/api/ocorrencias/${o.id}`, { method: "DELETE" });
+      fecharModal();
+      carregarOcorrencias();
+    });
+  }
+
+  function fecharModal(){
+    $("#modal-overlay").style.display = "none";
+    $("#modal-conteudo").innerHTML = "";
+  }
+
+  $("#modal-overlay").addEventListener("click", (e) => {
+    if(e.target.id === "modal-overlay") fecharModal();
+  });
+
+  $("#btn-modo").addEventListener("click", () => {
+    modoQuadrilha = !modoQuadrilha;
+    atualizarResumo();
+  });
+
+  function agruparPorRegional(lista){
+    const grupos = {};
+
+    // Começa com as 4 regionais fixas, já com o responsável, mesmo sem ocorrências ainda
+    REGIONAIS.forEach((r) => {
+      grupos[r.nome] = { nome: r.nome, responsavel: r.responsavel, total: 0, valorRecuperado: 0, quadrilha: 0 };
+    });
+
+    lista.forEach((o) => {
+      const chave = (o.regional || "").trim() || "Sem regional definida";
+      if(!grupos[chave]){
+        const info = REGIONAIS.find((r) => r.nome.toLowerCase() === chave.toLowerCase());
+        grupos[chave] = { nome: chave, responsavel: info ? info.responsavel : "", total: 0, valorRecuperado: 0, quadrilha: 0 };
+      }
+      grupos[chave].total += 1;
+      grupos[chave].valorRecuperado += (Number(o.valorRecuperado) || 0);
+      if(o.quadrilha) grupos[chave].quadrilha += 1;
+    });
+    return Object.values(grupos).sort((a, b) => b.total - a.total);
+  }
+
+  function renderizarRegionais(){
+    const container = $("#lista-regionais");
+    const grupos = agruparPorRegional(ocorrencias);
+
+    container.innerHTML = grupos.map((g) => `
+      <div class="cartao-regional" data-regional="${escapeHtml(g.nome)}">
+        <div class="nome-regional">${escapeHtml(g.nome)}</div>
+        ${g.responsavel ? `<div class="linha-metrica"><span>Responsável</span><strong>${escapeHtml(g.responsavel)}</strong></div>` : ""}
+        <div class="linha-metrica"><span>Ocorrências</span><strong>${g.total}</strong></div>
+        <div class="linha-metrica"><span>Recuperado</span><strong>${formatarMoeda(g.valorRecuperado)}</strong></div>
+        <div class="linha-metrica"><span>Quadrilha</span><strong>${g.quadrilha}</strong></div>
+      </div>
+    `).join("");
+
+    container.querySelectorAll(".cartao-regional").forEach((card) => {
+      card.addEventListener("click", () => {
+        const nome = card.dataset.regional;
+        if(nome === "Sem regional definida") return;
+        irParaLojas(nome);
+      });
+    });
+  }
+
+  ["#f-loja", "#f-regional", "#f-data-ini", "#f-data-fim"].forEach((sel) => {
+    $(sel).addEventListener("input", renderizarLista);
+  });
+  $("#f-quadrilha").addEventListener("change", renderizarLista);
+  $("#btn-limpar-filtro").addEventListener("click", () => {
+    $("#f-loja").value = "";
+    $("#f-regional").value = "";
+    $("#f-data-ini").value = "";
+    $("#f-data-fim").value = "";
+    $("#f-quadrilha").checked = false;
+    renderizarLista();
+  });
+
+  function atualizarResumo(){
+    const btn = $("#btn-modo");
+    const totalGeral = ocorrencias.reduce((s, o) => s + (Number(o.valorRecuperado) || 0), 0);
+    const totalQuadrilha = ocorrencias
+      .filter((o) => o.quadrilha)
+      .reduce((s, o) => s + (Number(o.valorRecuperado) || 0), 0);
+
+    $("#total-ocorrencias").textContent = ocorrencias.length;
+    $("#contador-ocorrencias").textContent = ocorrencias.length === 1
+      ? "1 registrada"
+      : `${ocorrencias.length} registradas`;
+
+    if(modoQuadrilha){
+      btn.classList.remove("modo-geral");
+      btn.classList.add("modo-quadrilha");
+      btn.querySelector(".rotulo").textContent = "Valor recuperado (quadrilha)";
+      btn.querySelector(".valor").textContent = formatarMoeda(totalQuadrilha);
+      btn.querySelector(".dica").textContent = "Clique para ver o valor recuperado total";
+    } else {
+      btn.classList.remove("modo-quadrilha");
+      btn.classList.add("modo-geral");
+      btn.querySelector(".rotulo").textContent = "Valor recuperado (total)";
+      btn.querySelector(".valor").textContent = formatarMoeda(totalGeral);
+      btn.querySelector(".dica").textContent = "Clique para ver só valor recuperado de quadrilha";
+    }
+
+    atualizarGrafico();
+    renderizarGraficoRegionais();
+  }
+
+  function renderizarGraficoRegionais(){
+    const container = $("#grafico-regionais");
+    const grupos = agruparPorRegional(ocorrencias);
+    const maior = Math.max(...grupos.map((g) => g.total), 1);
+    const ALTURA_MAX = 120;
+
+    container.innerHTML = grupos.map((g, i) => {
+      const altura = g.total === 0 ? 4 : Math.max(4, Math.round((g.total / maior) * ALTURA_MAX));
+      const cor = `cor-${(i % 4) + 1}`;
+      return `
+        <button type="button" class="grafico-coluna-regional" data-regional="${escapeHtml(g.nome)}">
+          <div class="grafico-valor">${g.total}</div>
+          <div class="grafico-barra ${cor}" style="height:${altura}px;"></div>
+          <div class="grafico-rotulo">${escapeHtml(g.nome)}</div>
+        </button>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".grafico-coluna-regional").forEach((col) => {
+      col.addEventListener("click", () => {
+        const nome = col.dataset.regional;
+        if(nome === "Sem regional definida") return;
+        irParaLojas(nome);
+      });
+    });
+  }
+
+  function atualizarGrafico(){
+    const qtdApoio = ocorrencias.filter((o) => o.apoioCopia).length;
+    const qtdQuadrilha = ocorrencias.filter((o) => o.quadrilha).length;
+    const qtdMonitoramento = ocorrencias.filter((o) => o.monitoramento).length;
+    const maior = Math.max(qtdApoio, qtdQuadrilha, qtdMonitoramento, 1);
+    const ALTURA_MAX = 120;
+
+    const partes = [
+      { valor: qtdApoio, elValor: "#grafico-valor-apoio", elBarra: "#grafico-barra-apoio" },
+      { valor: qtdQuadrilha, elValor: "#grafico-valor-quadrilha", elBarra: "#grafico-barra-quadrilha" },
+      { valor: qtdMonitoramento, elValor: "#grafico-valor-monitoramento", elBarra: "#grafico-barra-monitoramento" },
+    ];
+
+    partes.forEach((p) => {
+      $(p.elValor).textContent = p.valor;
+      const altura = p.valor === 0 ? 4 : Math.max(4, Math.round((p.valor / maior) * ALTURA_MAX));
+      $(p.elBarra).style.height = `${altura}px`;
+    });
+  }
+
+  function obterFiltros(){
+    return {
+      loja: $("#f-loja").value.trim().toLowerCase(),
+      regional: $("#f-regional").value.trim().toLowerCase(),
+      dataIni: $("#f-data-ini").value,
+      dataFim: $("#f-data-fim").value,
+      soQuadrilha: $("#f-quadrilha").checked,
+    };
+  }
+
+  function aplicarFiltros(lista){
+    const f = obterFiltros();
+    return lista.filter((o) => {
+      if(f.loja && !o.loja.toLowerCase().includes(f.loja)) return false;
+      if(f.regional && !(o.regional || "").toLowerCase().includes(f.regional)) return false;
+      if(f.dataIni && o.data < f.dataIni) return false;
+      if(f.dataFim && o.data > f.dataFim) return false;
+      if(f.soQuadrilha && !o.quadrilha) return false;
+      return true;
+    });
+  }
+
+  function atualizarResultadoFiltro(qtd, filtroAtivo){
+    const el = $("#resultado-filtro");
+    if(!filtroAtivo){
+      el.textContent = "";
+      return;
+    }
+    el.textContent = qtd === 0
+      ? "Nenhum registro encontrado para esse filtro."
+      : `${qtd} registro(s) encontrado(s).`;
+  }
+
+  function filtroEstaAtivo(){
+    const f = obterFiltros();
+    return Boolean(f.loja || f.regional || f.dataIni || f.dataFim || f.soQuadrilha);
+  }
+
+  function renderizarLista(){
+    const lista = $("#lista");
+    const filtroAtivo = filtroEstaAtivo();
+    const exibidas = filtroAtivo ? aplicarFiltros(ocorrencias) : ocorrencias;
+
+    atualizarResultadoFiltro(exibidas.length, filtroAtivo);
+
+    if(ocorrencias.length === 0){
+      lista.innerHTML = '<div class="vazio">Nenhuma ocorrência registrada ainda.</div>';
+      return;
+    }
+    if(exibidas.length === 0){
+      lista.innerHTML = '<div class="vazio">Nenhum registro corresponde ao filtro aplicado.</div>';
+      return;
+    }
+    lista.innerHTML = exibidas.map((o) => `
+      <div class="ocorrencia ${o.quadrilha ? "quadrilha" : ""}" data-id="${o.id}" tabindex="0">
+        ${o.foto ? `<img class="ocorrencia-foto" src="${o.foto}" alt="Foto da ocorrência" />` : ""}
+        <div class="cabecalho">
+          <span class="loja">${escapeHtml(o.loja)}${o.regional ? ` <span class="regional-tag">· ${escapeHtml(o.regional)}</span>` : ""}</span>
+          <span class="data">${formatarData(o.data)}</span>
+        </div>
+        <div class="descricao">${escapeHtml(o.descricao)}</div>
+        <div class="rodape">
+          <span>
+            ${o.quadrilha ? '<span class="tag-quadrilha">Quadrilha</span> ' : ""}
+            <span class="valor-recuperado">${formatarMoeda(o.valorRecuperado || 0)} recuperado</span>
+          </span>
+          <button class="excluir" data-id="${o.id}">Excluir</button>
+        </div>
+        <div class="tooltip-ocorrencia">
+          <div class="tooltip-linha"><span>Registrado por</span><strong>${escapeHtml(o.nome || "—")}</strong></div>
+          ${o.regional ? `<div class="tooltip-linha"><span>Regional</span><strong>${escapeHtml(o.regional)}</strong></div>` : ""}
+          <div class="tooltip-linha"><span>Apoio de cópia</span><strong>${o.apoioCopia ? "Sim" : "Não"}</strong></div>
+          <div class="tooltip-linha"><span>Monitoramento</span><strong>${o.monitoramento ? "Sim" : "Não"}</strong></div>
+          <div class="tooltip-linha"><span>Inibida</span><strong>${o.inibido ? "Sim" : "Não"}</strong></div>
+          <div class="tooltip-linha"><span>Quadrilha</span><strong>${o.quadrilha ? "Sim" : "Não"}</strong></div>
+          <div class="tooltip-linha"><span>Valor recuperado</span><strong>${formatarMoeda(o.valorRecuperado || 0)}</strong></div>
+        </div>
+      </div>
+    `).join("");
+
+    lista.querySelectorAll(".ocorrencia").forEach((card) => {
+      card.addEventListener("click", () => abrirDetalhe(card.dataset.id));
+    });
+
+    lista.querySelectorAll(".excluir").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if(!confirm("Excluir esta ocorrência?")) return;
+        await api(`/api/ocorrencias/${btn.dataset.id}`, { method: "DELETE" });
+        carregarOcorrencias();
+      });
+    });
+  }
+
+  function escapeHtml(s){
+    const div = document.createElement("div");
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  async function carregarOcorrencias(){
+    const resp = await api("/api/ocorrencias");
+    ocorrencias = await resp.json();
+    atualizarResumo();
+    atualizarVistaRegionais();
+    renderizarLista();
+  }
+
+  $("#form-ocorrencia").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const corpo = {
+      nome: $("#nome").value,
+      data: $("#data").value,
+      loja: $("#loja").value,
+      regional: $("#regional").value,
+      descricao: $("#descricao").value,
+      valorRecuperado: textoParaValor($("#valorRecuperado").value),
+      quadrilha: $("#quadrilha").checked,
+      inibido: $("#inibido").checked,
+      apoioCopia: $("#apoioCopia").checked,
+      monitoramento: $("#monitoramento").checked,
+      foto: fotoBase64Atual,
+    };
+    const resp = await api("/api/ocorrencias", {
+      method: "POST",
+      body: JSON.stringify(corpo),
+    });
+    if(resp.ok){
+      e.target.reset();
+      fotoBase64Atual = null;
+      $("#foto-preview").style.display = "none";
+      carregarOcorrencias();
+    } else {
+      const erro = await resp.json().catch(() => ({}));
+      alert(erro.erro || "Erro ao salvar a ocorrência.");
+    }
+  });
+
+  // inicializacao
+  if(senhaAtual){
+    mostrarPainel();
+  } else {
+    mostrarLogin();
+  }
+
+  // ---------- Instalação como app (PWA) ----------
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
+  }
+
+  let promptInstalacaoDiferido = null;
+  const btnInstalar = document.createElement("button");
+  btnInstalar.id = "btn-instalar-app";
+  btnInstalar.type = "button";
+  btnInstalar.textContent = "⬇ Instalar app";
+  btnInstalar.style.cssText = [
+    "display:none", "position:fixed", "right:18px", "bottom:18px", "z-index:100",
+    "background:var(--focus)", "color:#04121f", "font-family:var(--font-display)",
+    "font-weight:600", "font-size:0.85rem", "border:none", "border-radius:8px",
+    "padding:11px 16px", "cursor:pointer", "box-shadow:0 8px 24px rgba(0,0,0,0.4)",
+  ].join(";");
+  document.body.appendChild(btnInstalar);
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    promptInstalacaoDiferido = e;
+    btnInstalar.style.display = "block";
+  });
+
+  btnInstalar.addEventListener("click", async () => {
+    if(!promptInstalacaoDiferido) return;
+    btnInstalar.style.display = "none";
+    promptInstalacaoDiferido.prompt();
+    await promptInstalacaoDiferido.userChoice;
+    promptInstalacaoDiferido = null;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    btnInstalar.style.display = "none";
+  });
+
+</script>
+</body>
+</html>
